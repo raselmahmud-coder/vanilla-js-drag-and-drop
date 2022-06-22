@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .container {
+        font-family: "Trebuchet MS", sans-serif;
+        display: flex;
+        gap: 30px;
+      }
+      .warning{
+        background: #ef3333 !important;
+      }
+      .column {
+        flex-basis: 20%;
+        background: #ddd;
+        min-height: 90vh;
+        padding: 20px;
+        border-radius: 10px;
+      }
+      .column h1 {
+        text-align: center;
+        font-size: 22px;
+      }
+      .item {
+        display: block;
+        background: #fff;
+        margin: 20px;
+        padding: 20px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .invisible {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <form id="form">
+        <input type="text" name="task" required/>
+        <input type="submit" value="Add" />
+      </form>
+      <div class="column" id="addNew">
+        <h1>All Tasks</h1>
+        <span class="item" draggable="true">Wash Clothes</span>
+        <span class="item" draggable="true">Meeting at 9AM</span>
+        <span class="item" draggable="true">Fix workshop</span>
+        <span class="item" draggable="true">Visit the zoo</span>
+      </div>
+      <div class="column">
+        <h1>In progress</h1>
+      </div>
+      <div class="column">
+        <h1>Paused</h1>
+      </div>
+      <div class="column">
+        <h1>Under Review</h1>
+      </div>
+      <div class="column">
+        <h1>Completed</h1>
+      </div>
+    </div>
+
+    <script>
+      let dragItem = null;
+      const columns = document.querySelectorAll(".column");
+      const form = document.getElementById("form");
+      const addNew = document.querySelectorAll("#addNew");
+
+      form.addEventListener("submit", addToDo);
+
+      function addToDo(e) {
+        e.preventDefault();
+        const divCreate = document.createElement("span");
+        const value = e.target.task.value;
+        divCreate.className = "item";
+        divCreate.setAttribute("draggable", "true");
+        divCreate.innerText = value;
+
+        for (const iterator of addNew) {
+          // console.log("hello iterator",iterator)
+          iterator.appendChild(divCreate);
+        }
+        e.target.reset()
+
+        const items = document.querySelectorAll(".item");
+        // console.log(items,"items here");
+        items.forEach((item) => {
+          // console.log("how many item", item);
+          item.addEventListener("dragstart", dragStart);
+          item.addEventListener("dragend", dragEnd);
+        });
+        columns.forEach((column) => {
+          column.addEventListener("dragover", dragOver);
+          column.addEventListener("dragenter", dragEnter);
+          column.addEventListener("dragleave", dragLeave);
+          column.addEventListener("drop", dragDrop);
+        });
+        function dragOver(e) {
+          e.preventDefault();
+          // console.log("drag over",e);
+        }
+        function dragEnter(e) {
+          e.preventDefault();
+          console.log("drag entered", e);
+        }
+        function dragLeave(e) {
+          const length = e.target?.children?.length - 1;
+          const location = e.target?.children;
+          for (const column of columns) {
+            if (location[0]?.innerText == "All Tasks") {
+              continue;
+            }
+            console.log("location", location[0]?.innerText);
+            console.log("drag left", length);
+            if(length <= 3){
+              this.className = "column";
+
+            }
+          }
+
+        }
+
+
+        function dragDrop(e) {
+          this.append(dragItem);
+
+          // console.log("drag dropped",dragItem.getElementsByTagName("span"));
+          const length = e.target?.children?.length;
+          const location = e.target?.children;
+          // console.log("location", location[0]?.innerText);
+          // console.log("length", length);
+          // console.log("children",e.target?.children)
+
+          for (const column of columns) {
+            if (location[0]?.innerText == "All Tasks") {
+              continue;
+            }
+           /*  if (
+              column.firstChild.nextSibling.innerText == location[0].innerText
+            ) {
+            } */
+            // console.log(column.getElementsByTagName("span")?.namedItem?.length);
+
+            // console.log(column.getElementsByTagName("span").length)
+            /* if(column.childElementCount > 2){
+              console.log("you have add two or more")
+
+            } */
+            if (length > 3) {
+              this.className = "warning column";
+              console.warn("length is greeter then two");
+            }
+          }
+
+         
+        }
+
+        function dragStart(e) {
+          console.log("drag started", e);
+          dragItem = this;
+          setTimeout(() => (this.className = "invisible"), 0);
+        }
+
+        function dragEnd(e) {
+          console.log("drag ended");
+          this.className = "item";
+          dragItem = null;
+        }
+
+        /* let count = [];
+for (const item of items) {
+ 
+        count.push(item.tagName='span');
+        
+      }
+      console.log(count,'count')  */
+
+        /*  function getFeedBack(feedBack) {
+        
+        if (feedBack) {
+          for (const column of columns) {
+          if(column.firstChild.nextSibling.innerText == 'All Tasks'){
+            continue
+          }
+          console.log(column.firstChild.nextSibling.innerText)
+          if(column.childElementCount >= 2){
+           console.log("you have add two or more")
+          }
+          
+        }
+        }
+      } */
+      }
+    </script>
+  </body>
+</html>
